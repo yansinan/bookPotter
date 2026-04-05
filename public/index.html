@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>bookPotter | 低龄阅读</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">bookPotter</p>
+        <h1>哈利波特故事 · 一年级简读</h1>
+      </div>
+      <p class="page-subtitle">简化故事让孩子轻松阅读，后续可点击生字查看拼音。</p>
+    </header>
+
+    <main class="content-card">
+      <section class="story-panel">
+        <div class="story-meta">
+          <span>故事片段</span>
+          <el-badge value="简单版" class="badge"></el-badge>
+        </div>
+        <div class="story-list">
+          <story-item
+            v-for="(text, index) in simpleText"
+            :key="index"
+            :index="index + 1"
+            :text="text"
+          />
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/element-plus/dist/index.full.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
