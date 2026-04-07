@@ -113,7 +113,7 @@ const app = Vue.createApp({
       // Mark as learned
       if (!this.learnedWords.includes(word)) {
         this.learnedWords.push(word);
-        // Persist to localStorage (placeholder for future Alibaba Object Storage Service integration)
+        // Persist to localStorage (placeholder for future Alibaba Cloud OSS integration)
         localStorage.setItem(LEARNED_KEY, JSON.stringify(this.learnedWords));
       }
 

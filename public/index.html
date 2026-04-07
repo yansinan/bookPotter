@@ -71,7 +71,7 @@
     <!-- Pinyin Tooltip (inside .page-shell so Vue controls it) -->
     <transition name="tooltip-fade">
       <div v-if="tooltip.visible" class="pinyin-tooltip" :style="tooltipStyle" @click.stop>
-        <button class="tooltip-close" @click="closeTooltip" aria-label="关闭">×</button>
+        <button class="tooltip-close" @click="closeTooltip" aria-label="Close">×</button>
         <div class="tooltip-pinyin">{{ tooltip.pinyin }}</div>
         <div class="tooltip-word">{{ tooltip.word }}</div>
         <div class="tooltip-meaning">{{ tooltip.meaning }}</div>
