@@ -61,7 +61,8 @@ const app = Vue.createApp({
     try {
       const saved = JSON.parse(localStorage.getItem(LEARNED_KEY) || "[]");
       if (Array.isArray(saved)) this.learnedWords = saved;
-    } catch (_) {
+    } catch (e) {
+      console.warn("Failed to restore learned words:", e);
       this.learnedWords = [];
     }
 
@@ -141,41 +142,47 @@ app.component("story-item", {
       // Sort vocab words longest-first to prefer multi-character matches
       const sortedWords = Object.keys(this.vocabMap).sort((a, b) => b.length - a.length);
 
-      // Use a null-byte placeholder to avoid double-replacing
+      // Use unambiguous placeholder markers that won't appear in Chinese prose
       const placeholders = {};
       let result = this.text;
       sortedWords.forEach((word, idx) => {
-        const key = "\x00" + idx + "\x00";
+        const key = `__VOCAB_${idx}__`;
         placeholders[key] = this.vocabMap[word];
         result = result.split(word).join(key);
       });
 
+      // Escape a string for safe use inside an HTML attribute value
+      const escAttr = (s) =>
+        s
+          .replace(/&/g, "&amp;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+
       // Rebuild as HTML string
+      const vocabKeyRe = /__VOCAB_\d+__/g;
       let html = "";
-      let i = 0;
-      while (i < result.length) {
-        if (result[i] === "\x00") {
-          const end = result.indexOf("\x00", i + 1);
-          const key = result.substring(i, end + 1);
-          const item = placeholders[key];
-          const learned = this.learnedWords && this.learnedWords.includes(item.word) ? " learned" : "";
-          html +=
-            `<span class="vocab-word${learned}"` +
-            ` data-word="${item.word}"` +
-            ` data-pinyin="${item.pinyin}"` +
-            ` data-meaning="${item.meaning}">` +
-            `${item.word}</span>`;
-          i = end + 1;
-        } else {
-          // Escape HTML special characters
-          const ch = result[i];
-          if (ch === "&") html += "&amp;";
-          else if (ch === "<") html += "&lt;";
-          else if (ch === ">") html += "&gt;";
-          else html += ch;
-          i++;
-        }
+      let lastIndex = 0;
+      let match;
+      while ((match = vocabKeyRe.exec(result)) !== null) {
+        // Escape plain text before this match
+        const plain = result.slice(lastIndex, match.index);
+        html += escAttr(plain);
+
+        const item = placeholders[match[0]];
+        const learned = this.learnedWords && this.learnedWords.includes(item.word) ? " learned" : "";
+        html +=
+          `<span class="vocab-word${learned}"` +
+          ` data-word="${escAttr(item.word)}"` +
+          ` data-pinyin="${escAttr(item.pinyin)}"` +
+          ` data-meaning="${escAttr(item.meaning)}">` +
+          `${escAttr(item.word)}</span>`;
+
+        lastIndex = match.index + match[0].length;
       }
+      // Append remaining plain text
+      html += escAttr(result.slice(lastIndex));
       return html;
     },
   },
