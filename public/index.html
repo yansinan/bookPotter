@@ -10,29 +10,73 @@
 <body>
   <div class="page-shell">
     <header class="page-header">
-      <div>
-        <p class="eyebrow">bookPotter</p>
-        <h1>哈利波特故事 · 一年级简读</h1>
+      <div class="header-top">
+        <div>
+          <p class="eyebrow">bookPotter</p>
+          <h1>哈利波特故事 · 一年级简读</h1>
+        </div>
+        <div class="learned-counter">
+          <div class="counter-label">已学生字</div>
+          <div class="counter-value">{{ learnedWords.length }} <span class="counter-total">/ {{ vocab.length }}</span></div>
+        </div>
       </div>
-      <p class="page-subtitle">简化故事让孩子轻松阅读，后续可点击生字查看拼音。</p>
+      <p class="page-subtitle">简化故事让孩子轻松阅读，点击 <span class="sample-word">蓝色词语</span> 可以查看拼音！</p>
+      <div class="progress-track">
+        <div class="progress-fill" :style="{ width: vocab.length ? (learnedWords.length / vocab.length * 100) + '%' : '0%' }"></div>
+      </div>
     </header>
 
     <main class="content-card">
+      <div class="view-tabs">
+        <button class="tab-btn" :class="{ active: currentView === 'simple' }" @click="switchView('simple')">📖 简读版</button>
+        <button class="tab-btn" :class="{ active: currentView === 'original' }" @click="switchView('original')">📜 原文</button>
+      </div>
+
       <section class="story-panel">
         <div class="story-meta">
-          <span>故事片段</span>
-          <el-badge value="简单版" class="badge"></el-badge>
+          <span>{{ currentView === 'simple' ? '简化故事' : '原著片段' }}</span>
+          <el-badge :value="currentView === 'simple' ? '简单版' : '原著'" class="badge"></el-badge>
         </div>
-        <div class="story-list">
+        <div class="story-list" @click="handleWordClick">
           <story-item
-            v-for="(text, index) in simpleText"
-            :key="index"
+            v-for="(text, index) in currentText"
+            :key="currentView + index"
             :index="index + 1"
             :text="text"
+            :vocab-map="vocabMap"
+            :learned-words="learnedWords"
           />
         </div>
       </section>
+
+      <section class="vocab-panel">
+        <h2 class="vocab-title">📝 生字表 <span class="vocab-hint">点击故事里的蓝色词语来学习</span></h2>
+        <div class="vocab-grid">
+          <div
+            v-for="item in vocab"
+            :key="item.word"
+            class="vocab-card"
+            :class="{ learned: learnedWords.includes(item.word) }"
+            @click="showVocabDetail(item)"
+          >
+            <div class="vocab-pinyin">{{ item.pinyin }}</div>
+            <div class="vocab-char">{{ item.word }}</div>
+            <div class="vocab-meaning">{{ item.meaning }}</div>
+            <div v-if="learnedWords.includes(item.word)" class="learned-badge">✓ 已学</div>
+          </div>
+        </div>
+      </section>
     </main>
+
+    <!-- Pinyin Tooltip (inside .page-shell so Vue controls it) -->
+    <transition name="tooltip-fade">
+      <div v-if="tooltip.visible" class="pinyin-tooltip" :style="tooltipStyle" @click.stop>
+        <button class="tooltip-close" @click="closeTooltip" aria-label="Close">×</button>
+        <div class="tooltip-pinyin">{{ tooltip.pinyin }}</div>
+        <div class="tooltip-word">{{ tooltip.word }}</div>
+        <div class="tooltip-meaning">{{ tooltip.meaning }}</div>
+      </div>
+    </transition>
   </div>
 
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
