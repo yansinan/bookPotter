@@ -8,6 +8,8 @@ body {
   min-height: 100vh;
   padding: 24px;
 }
+
+/* ── Header ── */
 .page-header {
   max-width: 960px;
   margin: 0 auto 24px;
@@ -15,6 +17,13 @@ body {
   border-radius: 16px;
   background: #ffffff;
   box-shadow: 0 20px 40px rgba(29, 53, 87, 0.08);
+}
+.header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 .eyebrow {
   margin: 0 0 8px;
@@ -24,14 +33,89 @@ body {
 }
 h1 {
   margin: 0;
-  font-size: clamp(2rem, 2.4vw, 2.6rem);
+  font-size: clamp(1.6rem, 2.4vw, 2.6rem);
   line-height: 1.1;
 }
 .page-subtitle {
-  margin: 12px 0 0;
+  margin: 12px 0 12px;
   color: #607d9b;
   font-size: 1rem;
 }
+.sample-word {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: #e8f4ff;
+  color: #1a7fe8;
+  font-weight: 700;
+  border-bottom: 2px solid #409eff;
+  cursor: default;
+}
+
+/* ── Progress ── */
+.learned-counter {
+  text-align: center;
+  min-width: 80px;
+}
+.counter-label {
+  font-size: 0.75rem;
+  color: #607d9b;
+  margin-bottom: 2px;
+}
+.counter-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #409eff;
+  line-height: 1;
+}
+.counter-total {
+  font-size: 0.9rem;
+  color: #99afc8;
+}
+.progress-track {
+  height: 8px;
+  border-radius: 8px;
+  background: #e6ecf5;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #409eff, #67c23a);
+  transition: width 0.5s ease;
+}
+
+/* ── Tabs ── */
+.view-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px 18px;
+  border: 2px solid #d0dce8;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #607d9b;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tab-btn:hover {
+  border-color: #409eff;
+  color: #409eff;
+}
+.tab-btn.active {
+  border-color: #409eff;
+  background: #409eff;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+}
+
+/* ── Content card ── */
 .content-card {
   max-width: 960px;
   margin: 0 auto;
@@ -41,6 +125,7 @@ h1 {
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 16px 32px rgba(29, 53, 87, 0.06);
+  margin-bottom: 24px;
 }
 .story-meta {
   display: flex;
@@ -48,36 +133,195 @@ h1 {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 18px;
+  font-weight: 600;
+  color: #607d9b;
 }
 .story-list {
   display: grid;
   gap: 18px;
 }
 .story-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
   padding: 18px;
   border-radius: 14px;
   border: 1px solid #e6ecf5;
   background: #f7fbff;
-  line-height: 1.8;
-  font-size: 1rem;
+  line-height: 1.9;
+  font-size: 1.05rem;
 }
 .story-index {
   display: inline-flex;
   min-width: 32px;
   height: 32px;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  margin-right: 12px;
   border-radius: 50%;
   background: #409eff;
   color: #fff;
   font-weight: 700;
+  font-size: 0.9rem;
 }
 .story-text {
   margin: 0;
   color: #23314f;
+  flex: 1;
 }
+
+/* ── Vocab word highlighting ── */
+.vocab-word {
+  display: inline;
+  color: #1a7fe8;
+  font-weight: 700;
+  border-bottom: 2px solid #409eff;
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 0 2px;
+  transition: background 0.15s;
+}
+.vocab-word:hover {
+  background: #e8f4ff;
+}
+.vocab-word.learned {
+  color: #67c23a;
+  border-bottom-color: #67c23a;
+}
+.vocab-word.learned:hover {
+  background: #f0f9eb;
+}
+
+/* ── Pinyin tooltip ── */
+.pinyin-tooltip {
+  position: fixed;
+  z-index: 9999;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(29, 53, 87, 0.2);
+  padding: 20px 24px;
+  text-align: center;
+  border: 2px solid #e8f4ff;
+}
+.tooltip-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  border: none;
+  background: none;
+  font-size: 1.2rem;
+  color: #99afc8;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+.tooltip-close:hover {
+  color: #409eff;
+}
+.tooltip-pinyin {
+  font-size: 1rem;
+  color: #409eff;
+  font-weight: 600;
+  margin-bottom: 6px;
+  letter-spacing: 0.05em;
+}
+.tooltip-word {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #23314f;
+  margin-bottom: 6px;
+}
+.tooltip-meaning {
+  font-size: 0.85rem;
+  color: #607d9b;
+  line-height: 1.5;
+}
+.tooltip-fade-enter-active,
+.tooltip-fade-leave-active {
+  transition: opacity 0.2s, transform 0.2s;
+}
+.tooltip-fade-enter-from,
+.tooltip-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.95);
+}
+
+/* ── Vocabulary panel ── */
+.vocab-panel {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 16px 32px rgba(29, 53, 87, 0.06);
+}
+.vocab-title {
+  margin: 0 0 18px;
+  font-size: 1.1rem;
+  color: #2e3a59;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.vocab-hint {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #99afc8;
+}
+.vocab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 14px;
+}
+.vocab-card {
+  position: relative;
+  border: 2px solid #e6ecf5;
+  border-radius: 14px;
+  padding: 14px 10px 12px;
+  background: #f7fbff;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.vocab-card:hover {
+  border-color: #409eff;
+  box-shadow: 0 4px 14px rgba(64, 158, 255, 0.15);
+}
+.vocab-card.learned {
+  border-color: #67c23a;
+  background: #f0f9eb;
+}
+.vocab-pinyin {
+  font-size: 0.72rem;
+  color: #409eff;
+  font-weight: 600;
+  margin-bottom: 4px;
+  letter-spacing: 0.03em;
+}
+.vocab-card.learned .vocab-pinyin {
+  color: #67c23a;
+}
+.vocab-char {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #23314f;
+  margin-bottom: 4px;
+}
+.vocab-meaning {
+  font-size: 0.72rem;
+  color: #607d9b;
+  line-height: 1.4;
+}
+.learned-badge {
+  margin-top: 6px;
+  font-size: 0.68rem;
+  color: #67c23a;
+  font-weight: 700;
+}
+
+/* ── Responsive ── */
 @media (max-width: 640px) {
   .page-shell { padding: 16px; }
   .story-panel { padding: 18px; }
+  .vocab-panel { padding: 18px; }
+  .vocab-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
 }
