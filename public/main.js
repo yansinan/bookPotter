@@ -1,5 +1,28 @@
 const LEARNED_KEY = "bookPotter_learnedWords";
 
+// Escape for HTML attribute values (& must come first to avoid double-escaping)
+function escAttr(s) {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+// Escape for HTML body text (quotes are safe and readable in text content)
+function escText(s) {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+// Regex to locate vocab placeholders in processed story text.
+// Defined at module level to avoid recreation on every render;
+// lastIndex must be reset to 0 before each use because of the global flag.
+const VOCAB_KEY_RE = /__VOCAB_\d+__/g;
+
 const app = Vue.createApp({
   data() {
     return {
@@ -90,7 +113,7 @@ const app = Vue.createApp({
       // Mark as learned
       if (!this.learnedWords.includes(word)) {
         this.learnedWords.push(word);
-        // Persist to localStorage (placeholder for future OSS integration)
+        // Persist to localStorage (placeholder for future Alibaba Object Storage Service integration)
         localStorage.setItem(LEARNED_KEY, JSON.stringify(this.learnedWords));
       }
 
@@ -132,9 +155,6 @@ const app = Vue.createApp({
 
 app.use(ElementPlus);
 
-// Regex to locate vocab placeholders in processed story text
-const VOCAB_KEY_RE = /__VOCAB_\d+__/g;
-
 app.component("story-item", {
   props: ["index", "text", "vocabMap", "learnedWords"],
   computed: {
@@ -154,23 +174,7 @@ app.component("story-item", {
         result = result.split(word).join(key);
       });
 
-      // Escape for HTML attribute values (& must come first to avoid double-escaping)
-      const escAttr = (s) =>
-        s
-          .replace(/&/g, "&amp;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#39;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;");
-
-      // Escape for HTML body text (quotes don't need escaping in text content)
-      const escText = (s) =>
-        s
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;");
-
-      // Rebuild as HTML string using the module-level regex (reset lastIndex each call)
+      // Rebuild as HTML string; reset lastIndex because VOCAB_KEY_RE is a global regex
       VOCAB_KEY_RE.lastIndex = 0;
       let html = "";
       let lastIndex = 0;
