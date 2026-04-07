@@ -132,6 +132,9 @@ const app = Vue.createApp({
 
 app.use(ElementPlus);
 
+// Regex to locate vocab placeholders in processed story text
+const VOCAB_KEY_RE = /__VOCAB_\d+__/g;
+
 app.component("story-item", {
   props: ["index", "text", "vocabMap", "learnedWords"],
   computed: {
@@ -151,7 +154,7 @@ app.component("story-item", {
         result = result.split(word).join(key);
       });
 
-      // Escape a string for safe use inside an HTML attribute value
+      // Escape for HTML attribute values (& must come first to avoid double-escaping)
       const escAttr = (s) =>
         s
           .replace(/&/g, "&amp;")
@@ -160,15 +163,21 @@ app.component("story-item", {
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;");
 
-      // Rebuild as HTML string
-      const vocabKeyRe = /__VOCAB_\d+__/g;
+      // Escape for HTML body text (quotes don't need escaping in text content)
+      const escText = (s) =>
+        s
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+
+      // Rebuild as HTML string using the module-level regex (reset lastIndex each call)
+      VOCAB_KEY_RE.lastIndex = 0;
       let html = "";
       let lastIndex = 0;
       let match;
-      while ((match = vocabKeyRe.exec(result)) !== null) {
+      while ((match = VOCAB_KEY_RE.exec(result)) !== null) {
         // Escape plain text before this match
-        const plain = result.slice(lastIndex, match.index);
-        html += escAttr(plain);
+        html += escText(result.slice(lastIndex, match.index));
 
         const item = placeholders[match[0]];
         const learned = this.learnedWords && this.learnedWords.includes(item.word) ? " learned" : "";
@@ -177,12 +186,12 @@ app.component("story-item", {
           ` data-word="${escAttr(item.word)}"` +
           ` data-pinyin="${escAttr(item.pinyin)}"` +
           ` data-meaning="${escAttr(item.meaning)}">` +
-          `${escAttr(item.word)}</span>`;
+          `${escText(item.word)}</span>`;
 
         lastIndex = match.index + match[0].length;
       }
       // Append remaining plain text
-      html += escAttr(result.slice(lastIndex));
+      html += escText(result.slice(lastIndex));
       return html;
     },
   },
